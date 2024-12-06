@@ -1,5 +1,4 @@
 import { Link as RouterLink, Link, useNavigate } from 'react-router-dom';
-
 // material-ui
 import {
   Button,
@@ -21,12 +20,13 @@ import {
 import AuthWrapper from './AuthWrapper';
 import * as Yup from 'yup';
 import Cookies from 'js-cookie';
-import Dashboard from '../dashboard';
+// import Dashboard from '../dashboard';
 import { EyeInvisibleOutlined, EyeOutlined } from '@ant-design/icons';
 import AnimateButton from '../../components/@extended/AnimateButton';
-import FirebaseSocial from './auth-forms/FirebaseSocial';
+// import FirebaseSocial from './auth-forms/FirebaseSocial';
 import { Formik } from 'formik';
 import React from 'react';
+import { jwtDecode } from 'jwt-decode';
 
 // ================================|| LOGIN ||================================ //
 
@@ -43,16 +43,16 @@ const Login = () => {
   };
   return (
     <AuthWrapper>
-      <Grid container spacing={3}>
-        <Grid item xs={12}>
-          <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: { xs: -0.5, sm: 0.5 } }}>
-            <Typography variant="h3">Login</Typography>
-            <Typography component={Link} to="/register" variant="body1" sx={{ textDecoration: 'none' }} color="primary">
-              Don&apos;t have an account?
-            </Typography>
-          </Stack>
-        </Grid>
-        <Grid item xs={12}>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+            <Stack direction="row" justifyContent="space-between" alignItems="baseline" sx={{ mb: { xs: -0.5, sm: 0.5 } }}>
+              <Typography variant="h3">Login</Typography>
+              <Typography component={Link} to="/register" variant="body1" sx={{ textDecoration: 'none' }} color="primary">
+                Don&apos;t have an account?
+              </Typography>
+            </Stack>
+          </Grid>
+          <Grid item xs={12}>
           <Formik
             initialValues={{
               email: '',
@@ -89,14 +89,33 @@ const Login = () => {
                 setStatus({ success: true });
                 setSubmitting(false);
 
-                const { token } = data;
+                const token = data.data.token;
+                console.log('Token', token);
                 Cookies.set('authToken', token, { expires: 7 });
+                setStatus({ success: true });
+                setSubmitting(false);
+
+                // Decode the token to extract user details
+                const decodedToken = jwtDecode(token);
+                console.log('Decoded Token for userRole:', decodedToken.userRole);
+
+                // Check if the user's role is ROLE_ADMIN
+                if (decodedToken.userRole === 'ROLE_ADMIN') {
+                  // Navigate to dashboard
+                  navigate('/userTable');
+                } else if (decodedToken.userRole === 'Vendor') {
+                  // Navigate to dashboard
+                  navigate('/dashboard');
+                } else if (decodedToken.userRole === 'Customer') {
+                  // Navigate to dashboard
+                  navigate('/product');
+                } else {
+                  setTimeout(() => (window.location.href = '/register'), 3000);
+                  throw new Error('Access Denied. You are not required User.');
+                }
 
                 // Example: Save token to local storage
                 localStorage.setItem('token', data.token);
-
-                // Navigate to dashboard
-                navigate(<Dashboard />);
               } catch (err) {
                 // Handle errors
                 console.error(err);
@@ -209,9 +228,9 @@ const Login = () => {
                       <Typography variant="caption"> Login with</Typography>
                     </Divider>
                   </Grid>
-                  <Grid item xs={12}>
-                    <FirebaseSocial />
-                  </Grid>
+                  {/*<Grid item xs={12}>*/}
+                  {/*  <FirebaseSocial />*/}
+                  {/*</Grid>*/}
                 </Grid>
               </form>
             )}

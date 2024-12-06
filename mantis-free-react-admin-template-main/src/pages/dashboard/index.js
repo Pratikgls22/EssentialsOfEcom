@@ -1,77 +1,118 @@
-import { useState } from 'react';
+// import React, { useEffect, useState } from 'react';
 
-// material-ui
-import {
-  Avatar,
-  AvatarGroup,
-  Box,
-  Button,
-  Grid,
-  List,
-  ListItemAvatar,
-  ListItemButton,
-  ListItemSecondaryAction,
-  ListItemText,
-  MenuItem,
-  Stack,
-  TextField,
-  Typography
+import { Grid, Typography
+  // MenuItem, FormControl, Select, InputLabel, Button, Modal, Box
 } from '@mui/material';
 
-// project import
-import OrdersTable from './OrdersTable';
-import IncomeAreaChart from './IncomeAreaChart';
-import MonthlyBarChart from './MonthlyBarChart';
-import ReportAreaChart from './ReportAreaChart';
-import SalesColumnChart from './SalesColumnChart';
-import MainCard from 'components/MainCard';
+
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
-
-// assets
-import { GiftOutlined, MessageOutlined, SettingOutlined } from '@ant-design/icons';
-import avatar1 from 'assets/images/users/avatar-1.png';
-import avatar2 from 'assets/images/users/avatar-2.png';
-import avatar3 from 'assets/images/users/avatar-3.png';
-import avatar4 from 'assets/images/users/avatar-4.png';
-
-// avatar style
-const avatarSX = {
-  width: 36,
-  height: 36,
-  fontSize: '1rem'
-};
-
-// action style
-const actionSX = {
-  mt: 0.75,
-  ml: 1,
-  top: 'auto',
-  right: 'auto',
-  alignSelf: 'flex-start',
-  transform: 'none'
-};
-
-// sales report status
-const status = [
-  {
-    value: 'today',
-    label: 'Today'
-  },
-  {
-    value: 'month',
-    label: 'This Month'
-  },
-  {
-    value: 'year',
-    label: 'This Year'
-  }
-];
-
-// ==============================|| DASHBOARD - DEFAULT ||============================== //
+import OrderTable from './OrdersTable';
+// import Shadow from '../components-overview/Shadow';
 
 const DashboardDefault = () => {
-  const [value, setValue] = useState('today');
-  const [slot, setSlot] = useState('week');
+  // const [brands, setBrands] = useState([]); // State to store brands
+  // const [loading, setLoading] = useState(true); // Loading state for API call
+  // const [error, setError] = useState(''); // Error state for API call
+  // const [selectedBrand, setSelectedBrand] = useState(''); // State to store selected brand
+  // const [brandDetails, setBrandDetails] = useState([]); // State to store selected brand details
+  // const [detailsLoading, setDetailsLoading] = useState(false); // Loading state for brand details
+  // const [detailsError, setDetailsError] = useState(''); // Error state for brand details
+  // const [open, setOpen] = useState(false); // State for modal visibility
+  // const [specData, setSpecData] = useState(null); // State for modal data
+
+  // const handleOpen = (moreSpecification) => {
+  //   // Parse JSON if needed and set spec data
+  //   if (typeof moreSpecification === 'string') {
+  //     const parsedData = JSON.parse(moreSpecification);
+  //     setSpecData(parsedData);
+  //   } else {
+  //     setSpecData(moreSpecification);
+  //   }
+  //   setOpen(true);
+  // };
+  //
+  // const handleClose = () => {
+  //   setOpen(false);
+  //   setSpecData(null);
+  // };
+  //
+  // // ** Fetch brands from API **
+  // const fetchBrands = async () => {
+  //   try {
+  //     const response = await fetch('http://localhost:8080/api/v1/phone/fetchBrands', {
+  //       method: 'GET', // Explicitly specifying HTTP method
+  //       headers: {
+  //         'Content-Type': 'application/json' // Indicating the request accepts JSON
+  //       }
+  //     });
+  //     console.log('Fetch Brand Response:', response);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch data');
+  //     }
+  //     const data = await response.json(); // Parse JSON response
+  //     console.log('Parsed Data:', data); // Log parsed data for debugging
+  //     setBrands(data.data); // Assuming response format: { data: [...] }
+  //     setLoading(false); // Stop loading
+  //   } catch (err) {
+  //     console.error('Error:', err); // Log error for debugging
+  //     setError('Failed to fetch brands! Please try again later.');
+  //     setLoading(false); // Stop loading on error
+  //   }
+  // };
+  //
+  // // ** Fetch brand details after brand is selected **
+  // const fetchBrandDetails = async (brand) => {
+  //   setDetailsLoading(true); // Start loading for brand details
+  //   try {
+  //     const response = await fetch(`http://localhost:8080/api/v1/phone/fetchDetailsOfModel/${brand}`, {
+  //       method: 'GET',
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
+  //     console.log('Fetch Brand Details Response:', response);
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch brand details');
+  //     }
+  //     const data = await response.json();
+  //     console.log('Parsed Brand Details:', data);
+  //     setBrandDetails(data.data); // Assuming response format: { data: [...] }
+  //     setDetailsLoading(false); // Stop loading
+  //
+  //     // Parse the `moreSpecification` field for each brand detail
+  //     const parsedDetails = data.data.map((brandDetail) => {
+  //       let moreSpecification = [];
+  //       if (brandDetail.moreSpecification) {
+  //         try {
+  //           moreSpecification = JSON.parse(brandDetail.moreSpecification);
+  //         } catch (err) {
+  //           console.error(`Error parsing moreSpecification for ${brandDetail.model}:`, err);
+  //         }
+  //       }
+  //       return { ...brandDetail, moreSpecification }; // Add parsed `moreSpecification` to each detail
+  //     });
+  //
+  //     setBrandDetails(parsedDetails); // Assuming response format: { data: [...] }
+  //     setDetailsLoading(false); // Stop loading
+  //   } catch (err) {
+  //     console.error('Error:', err); // Log error for debugging
+  //     setDetailsError('Failed to fetch brand details! Please try again later.');
+  //     setDetailsLoading(false); // Stop loading on error
+  //   }
+  // };
+  //
+  // // ** Handle Brand Change (Dropdown selection) **
+  // const handleBrandChange = (event) => {
+  //   const brand = event.target.value;
+  //   setSelectedBrand(brand); // Set the selected brand
+  //   console.log('Selected Brand:', brand);
+  //   fetchBrandDetails(brand); // Fetch brand details when a brand is selected
+  // };
+  //
+  // // ** Call fetchBrands on component mount **
+  // useEffect(() => {
+  //   fetchBrands();
+  // }, []);
 
   return (
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
@@ -92,251 +133,156 @@ const DashboardDefault = () => {
         <AnalyticEcommerce title="Total Sales" count="$35,078" percentage={27.4} isLoss color="warning" extra="$20,395" />
       </Grid>
 
-      <Grid item md={8} sx={{ display: { sm: 'none', md: 'block', lg: 'none' } }} />
+      {/* Brand List */}
+      {/*<Grid item xs={1.5}>*/}
+      {/*  <Typography variant="h5">Brand List</Typography>*/}
+      {/*  {loading && <Typography>Loading...</Typography>} /!* Loading Indicator *!/*/}
+      {/*  {error && <Typography color="error">{error}</Typography>} /!* Error Message *!/*/}
+      {/*  /!* Dropdown to select a brand *!/*/}
+      {/*  {!loading && !error && (*/}
+      {/*    <FormControl fullWidth>*/}
+      {/*      <InputLabel id="brand-select-label">Select Brand</InputLabel>*/}
+      {/*      <Select labelId="brand-select-label" value={selectedBrand} label="Select Brand" onChange={handleBrandChange}>*/}
+      {/*        {brands.map((brand, index) => (*/}
+      {/*          <MenuItem key={index} value={brand}>*/}
+      {/*            {brand} /!* Display brand name in the dropdown *!/*/}
+      {/*          </MenuItem>*/}
+      {/*        ))}*/}
+      {/*      </Select>*/}
+      {/*    </FormControl>*/}
+      {/*  )}*/}
+      {/*</Grid>*/}
 
-      {/* row 2 */}
-      <Grid item xs={12} md={7} lg={8}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Unique Visitor</Typography>
-          </Grid>
-          <Grid item>
-            <Stack direction="row" alignItems="center" spacing={0}>
-              <Button
-                size="small"
-                onClick={() => setSlot('month')}
-                color={slot === 'month' ? 'primary' : 'secondary'}
-                variant={slot === 'month' ? 'outlined' : 'text'}
-              >
-                Month
-              </Button>
-              <Button
-                size="small"
-                onClick={() => setSlot('week')}
-                color={slot === 'week' ? 'primary' : 'secondary'}
-                variant={slot === 'week' ? 'outlined' : 'text'}
-              >
-                Week
-              </Button>
-            </Stack>
-          </Grid>
-        </Grid>
-        <MainCard content={false} sx={{ mt: 1.5 }}>
-          <Box sx={{ pt: 1, pr: 2 }}>
-            <IncomeAreaChart slot={slot} />
-          </Box>
-        </MainCard>
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Income Overview</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <Box sx={{ p: 3, pb: 0 }}>
-            <Stack spacing={2}>
-              <Typography variant="h6" color="textSecondary">
-                This Week Statistics
-              </Typography>
-              <Typography variant="h3">$7,650</Typography>
-            </Stack>
-          </Box>
-          <MonthlyBarChart />
-        </MainCard>
-      </Grid>
+      {/* Brand Details */}
+      {/*<Grid item xs={12}>*/}
+      {/*  {detailsLoading && <Typography>Loading brand details...</Typography>}*/}
+      {/*  {detailsError && <Typography color="error">{detailsError}</Typography>}*/}
+      {/*  {!detailsLoading && !detailsError && brandDetails.length > 0 && (*/}
+      {/*    <div>*/}
+      {/*      <Typography variant="h5">Brand Details</Typography>*/}
+      {/*      <div*/}
+      {/*        style={{*/}
+      {/*          marginTop: '3px',*/}
+      {/*          display: 'flex',*/}
+      {/*          flexWrap: 'wrap', // Allow items to wrap to the next line if needed*/}
+      {/*          gap: '25px' // Space between the items*/}
+      {/*        }}*/}
+      {/*      >*/}
+      {/*        {brandDetails.map((brandDetail, index) => (*/}
+      {/*          <div*/}
+      {/*            key={index}*/}
+      {/*            style={{*/}
+      {/*              flex: '1 1 calc(25% - 16px)', // Takes 25% of the container width minus space*/}
+      {/*              boxSizing: 'border-box' // Ensures padding is included in the width*/}
+      {/*            }}*/}
+      {/*          >*/}
+      {/*            <Typography variant="h6">{brandDetail.model}</Typography>*/}
+      {/*            <img src={brandDetail.deviceImage} alt={brandDetail.model} style={{ width: '100px', height: 'auto' }} />*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Body:</strong> {brandDetail.body}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Display Resolution:</strong> {brandDetail.displayResolution}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Video:</strong> {brandDetail.video}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Ram:</strong> {brandDetail.ram}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Chipset:</strong> {brandDetail.chipset}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Release Date:</strong> {brandDetail.releaseDate}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Storage:</strong> {brandDetail.storage}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Battery:</strong> {brandDetail.battery}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Camera:</strong> {brandDetail.camera}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>Display Size:</strong> {brandDetail.displaySize}*/}
+      {/*            </Typography>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>OS:</strong> {brandDetail.osType}*/}
+      {/*            </Typography>*/}
+      {/*            /!*<Typography>*!/*/}
+      {/*            /!*  <strong>Price:</strong>{' '}*!/*/}
+      {/*            /!*  {brandDetail.moreSpecification && Array.isArray(brandDetail.moreSpecification)*!/*/}
+      {/*            /!*    ? brandDetail.moreSpecification.find((spec) => spec.title === 'Misc')?.data[0]*!/*/}
+      {/*            /!*    : 'No price available'}*!/*/}
+      {/*            /!*</Typography>*!/*/}
 
-      {/* row 3 */}
-      <Grid item xs={12} md={7} lg={8}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Recent Orders</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <OrdersTable />
-        </MainCard>
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Analytics Report</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <List sx={{ p: 0, '& .MuiListItemButton-root': { py: 2 } }}>
-            <ListItemButton divider>
-              <ListItemText primary="Company Finance Growth" />
-              <Typography variant="h5">+45.14%</Typography>
-            </ListItemButton>
-            <ListItemButton divider>
-              <ListItemText primary="Company Expenses Ratio" />
-              <Typography variant="h5">0.58%</Typography>
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemText primary="Business Risk Cases" />
-              <Typography variant="h5">Low</Typography>
-            </ListItemButton>
-          </List>
-          <ReportAreaChart />
-        </MainCard>
-      </Grid>
+      {/*            /!* Additional Specifications Button *!/*/}
+      {/*            <Button*/}
+      {/*              variant="contained"*/}
+      {/*              color="primary"*/}
+      {/*              onClick={() => handleOpen(brandDetail.moreSpecification)}*/}
+      {/*              style={{ marginTop: '10px' }}*/}
+      {/*            >*/}
+      {/*              Additional Specifications*/}
+      {/*            </Button>*/}
+      {/*          </div>*/}
+      {/*        ))}*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*  )}*/}
+      {/*</Grid>*/}
 
-      {/* row 4 */}
-      <Grid item xs={12} md={7} lg={8}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Sales Report</Typography>
-          </Grid>
-          <Grid item>
-            <TextField
-              id="standard-select-currency"
-              size="small"
-              select
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              sx={{ '& .MuiInputBase-input': { py: 0.5, fontSize: '0.875rem' } }}
-            >
-              {status.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-        </Grid>
-        <MainCard sx={{ mt: 1.75 }}>
-          <Stack spacing={1.5} sx={{ mb: -12 }}>
-            <Typography variant="h6" color="secondary">
-              Net Profit
-            </Typography>
-            <Typography variant="h4">$1560</Typography>
-          </Stack>
-          <SalesColumnChart />
-        </MainCard>
-      </Grid>
-      <Grid item xs={12} md={5} lg={4}>
-        <Grid container alignItems="center" justifyContent="space-between">
-          <Grid item>
-            <Typography variant="h5">Transaction History</Typography>
-          </Grid>
-          <Grid item />
-        </Grid>
-        <MainCard sx={{ mt: 2 }} content={false}>
-          <List
-            component="nav"
-            sx={{
-              px: 0,
-              py: 0,
-              '& .MuiListItemButton-root': {
-                py: 1.5,
-                '& .MuiAvatar-root': avatarSX,
-                '& .MuiListItemSecondaryAction-root': { ...actionSX, position: 'relative' }
-              }
-            }}
-          >
-            <ListItemButton divider>
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    color: 'success.main',
-                    bgcolor: 'success.lighter'
-                  }}
-                >
-                  <GiftOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #002434</Typography>} secondary="Today, 2:00 AM" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $1,430
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    78%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-            <ListItemButton divider>
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    color: 'primary.main',
-                    bgcolor: 'primary.lighter'
-                  }}
-                >
-                  <MessageOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #984947</Typography>} secondary="5 August, 1:45 PM" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $302
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    8%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-            <ListItemButton>
-              <ListItemAvatar>
-                <Avatar
-                  sx={{
-                    color: 'error.main',
-                    bgcolor: 'error.lighter'
-                  }}
-                >
-                  <SettingOutlined />
-                </Avatar>
-              </ListItemAvatar>
-              <ListItemText primary={<Typography variant="subtitle1">Order #988784</Typography>} secondary="7 hours ago" />
-              <ListItemSecondaryAction>
-                <Stack alignItems="flex-end">
-                  <Typography variant="subtitle1" noWrap>
-                    + $682
-                  </Typography>
-                  <Typography variant="h6" color="secondary" noWrap>
-                    16%
-                  </Typography>
-                </Stack>
-              </ListItemSecondaryAction>
-            </ListItemButton>
-          </List>
-        </MainCard>
-        <MainCard sx={{ mt: 2 }}>
-          <Stack spacing={3}>
-            <Grid container justifyContent="space-between" alignItems="center">
-              <Grid item>
-                <Stack>
-                  <Typography variant="h5" noWrap>
-                    Help & Support Chat
-                  </Typography>
-                  <Typography variant="caption" color="secondary" noWrap>
-                    Typical replay within 5 min
-                  </Typography>
-                </Stack>
-              </Grid>
-              <Grid item>
-                <AvatarGroup sx={{ '& .MuiAvatar-root': { width: 32, height: 32 } }}>
-                  <Avatar alt="Remy Sharp" src={avatar1} />
-                  <Avatar alt="Travis Howard" src={avatar2} />
-                  <Avatar alt="Cindy Baker" src={avatar3} />
-                  <Avatar alt="Agnes Walker" src={avatar4} />
-                </AvatarGroup>
-              </Grid>
-            </Grid>
-            <Button size="small" variant="contained" sx={{ textTransform: 'capitalize' }}>
-              Need Help?
-            </Button>
-          </Stack>
-        </MainCard>
-      </Grid>
+      {/* Modal for Additional Specifications */}
+      {/*<Modal open={open} onClose={handleClose} aria-labelledby="modal-title">*/}
+      {/*  <Box*/}
+      {/*    sx={{*/}
+      {/*      position: 'absolute',*/}
+      {/*      top: '50%',*/}
+      {/*      left: '50%',*/}
+      {/*      transform: 'translate(-50%, -50%)',*/}
+      {/*      width: 1100,*/}
+      {/*      height: 500, // Reduced height*/}
+      {/*      bgcolor: 'background.paper',*/}
+      {/*      boxShadow: 24,*/}
+      {/*      p: 4,*/}
+      {/*      borderRadius: 2,*/}
+      {/*      overflow: 'auto' // Enables scrolling for the content*/}
+      {/*    }}*/}
+      {/*  >*/}
+      {/*    <Typography id="modal-title" variant="h6" component="h2">*/}
+      {/*      Additional Specifications*/}
+      {/*    </Typography>*/}
+      {/*    {specData && Array.isArray(specData) ? (*/}
+      {/*      <ul>*/}
+      {/*        {specData.map((spec, idx) => (*/}
+      {/*          <li key={idx}>*/}
+      {/*            <Typography>*/}
+      {/*              <strong>{spec.title}:</strong>*/}
+      {/*            </Typography>*/}
+      {/*            <ul>*/}
+      {/*              {spec.data.map((item, subIdx) => (*/}
+      {/*                <li key={subIdx}>*/}
+      {/*                  {item.title}: {item.data}*/}
+      {/*                </li>*/}
+      {/*              ))}*/}
+      {/*            </ul>*/}
+      {/*          </li>*/}
+      {/*        ))}*/}
+      {/*      </ul>*/}
+      {/*    ) : (*/}
+      {/*      <Typography>No additional specifications available</Typography>*/}
+      {/*    )}*/}
+      {/*    <Button variant="contained" onClick={handleClose} sx={{ mt: 2 }}>*/}
+      {/*      Close*/}
+      {/*    </Button>*/}
+      {/*  </Box>*/}
+      {/*</Modal>*/}
+
+      {/* Other dashboard components go here */}
+      <OrderTable />
+      {/*<Shadow />*/}
     </Grid>
   );
 };

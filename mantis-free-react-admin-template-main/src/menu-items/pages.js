@@ -29,6 +29,14 @@ const pages = {
       url: '/register',
       icon: icons.ProfileOutlined,
       target: true
+    },
+    {
+      id: 'user1',
+      title: 'UserTable',
+      type: 'item',
+      url: '/userTable',
+      icon: icons.ProfileOutlined,
+      target: true
     }
   ]
 };

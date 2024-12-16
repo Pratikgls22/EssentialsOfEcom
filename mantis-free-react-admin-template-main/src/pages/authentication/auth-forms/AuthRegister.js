@@ -27,7 +27,7 @@
 // // project import
 // import FirebaseSocial from './FirebaseSocial';
 // import AnimateButton from 'components/@extended/AnimateButton';
-// import { strengthColor, strengthIndicator } from 'utils/password-strength';
+// import { strengthColor, strengthIndicator } from 'utilies/password-strength';
 //
 // // assets
 // import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';

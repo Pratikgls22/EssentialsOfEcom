@@ -37,6 +37,30 @@ const pages = {
       url: '/userTable',
       icon: icons.ProfileOutlined,
       target: true
+    },
+    {
+      id: 'vendor',
+      title: 'VendorRegister',
+      type: 'item',
+      url: '/vendorRegister',
+      icon: icons.ProfileOutlined,
+      target: true
+    },
+    {
+      id: 'productDraft',
+      title: 'CreateProductDraft',
+      type: 'item',
+      url: '/productDraft',
+      icon: icons.ProfileOutlined,
+      target: true
+    },
+    {
+      id: 'productDraft',
+      title: 'FetchProductDraft',
+      type: 'item',
+      url: '/fetchProductDraft',
+      icon: icons.ProfileOutlined,
+      target: true
     }
   ]
 };

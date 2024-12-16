@@ -1,24 +1,49 @@
 // import React, { useEffect, useState } from 'react';
 
-import { Grid, Typography
+import {
+  Grid,
+  Typography
   // MenuItem, FormControl, Select, InputLabel, Button, Modal, Box
 } from '@mui/material';
 
-
 import AnalyticEcommerce from 'components/cards/statistics/AnalyticEcommerce';
-import OrderTable from './OrdersTable';
+// import OrderTable from './OrdersTable';
+import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import { useEffect, useState } from 'react';
 // import Shadow from '../components-overview/Shadow';
 
 const DashboardDefault = () => {
   // const [brands, setBrands] = useState([]); // State to store brands
   // const [loading, setLoading] = useState(true); // Loading state for API call
-  // const [error, setError] = useState(''); // Error state for API call
+  const [error, setError] = useState(''); // Error state for API call
+  console.log(error);
   // const [selectedBrand, setSelectedBrand] = useState(''); // State to store selected brand
   // const [brandDetails, setBrandDetails] = useState([]); // State to store selected brand details
   // const [detailsLoading, setDetailsLoading] = useState(false); // Loading state for brand details
   // const [detailsError, setDetailsError] = useState(''); // Error state for brand details
   // const [open, setOpen] = useState(false); // State for modal visibility
   // const [specData, setSpecData] = useState(null); // State for modal data
+
+  try {
+    // Retrieve the token from cookies
+    const token = Cookies.get('authToken');
+    // Decode the token to extract user details
+    const decodedToken = jwtDecode(token);
+    console.log('Decoded Token for userRole:', decodedToken.userRole);
+
+    if (decodedToken.userRole !== 'Vendor') {
+      // eslint-disable-next-line no-unreachable
+      setTimeout(() => (window.location.href = '/login'), 3000);
+      throw new Error('Access Denied. You do not have the required role.');
+    }
+  } catch (err) {
+    setError(err.message);
+  }
+
+  useEffect(() => {
+    // fetchBrands();
+  }, []);
 
   // const handleOpen = (moreSpecification) => {
   //   // Parse JSON if needed and set spec data
@@ -281,7 +306,7 @@ const DashboardDefault = () => {
       {/*</Modal>*/}
 
       {/* Other dashboard components go here */}
-      <OrderTable />
+      {/*<OrderTable />*/}
       {/*<Shadow />*/}
     </Grid>
   );

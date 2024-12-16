@@ -7,15 +7,21 @@ import { List, ListItemButton, ListItemIcon, ListItemText } from '@mui/material'
 
 // assets
 import { EditOutlined, ProfileOutlined, LogoutOutlined, UserOutlined, WalletOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
 
-const ProfileTab = ({ handleLogout }) => {
+const ProfileTab = () => {
   const theme = useTheme();
-
+  const navigate = useNavigate();
   const [selectedIndex, setSelectedIndex] = useState(0);
+
   const handleListItemClick = (event, index) => {
     setSelectedIndex(index);
+  };
+
+  const handleLogout = () => {
+    navigate('/logout'); // Navigate to the Logout page
   };
 
   return (

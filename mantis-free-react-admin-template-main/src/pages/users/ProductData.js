@@ -61,6 +61,9 @@ const ProductData = () => {
   // ** Fetch brand details after brand is selected **
   const fetchBrandDetails = async (brand) => {
     setDetailsLoading(true); // Start loading for brand details
+    setDetailsError(null); // Clear any previous error
+    setBrandDetails(null); // Clear previous brand details
+
     try {
       const response = await fetch(`http://localhost:8080/api/v1/phone/fetchDetailsOfModel/${brand}`, {
         method: 'GET',
@@ -68,34 +71,28 @@ const ProductData = () => {
           'Content-Type': 'application/json'
         }
       });
-      console.log('Fetch Brand Details Response:', response);
+      console.log('fetchBrandDetails >>> Fetch Brand Details Response:', response);
+
       if (!response.ok) {
-        throw new Error('Failed to fetch brand details');
+        throw new Error(`Failed to fetch brand details :: ${response.status} ${response.statusText}`);
       }
+
       const data = await response.json();
-      console.log('Parsed Brand Details:', data);
+      console.log('fetchBrandDetails >>> Parsed Brand Details:', data);
+
+      if (!data.data || data.data.length === 0) {
+        // Handle cases where no brand details are available
+        throw new Error('No brand details found for the selected brand.');
+      }
+
       setBrandDetails(data.data); // Assuming response format: { data: [...] }
-      setDetailsLoading(false); // Stop loading
-
-      // Parse the `moreSpecification` field for each brand detail
-      const parsedDetails = data.data.map((brandDetail) => {
-        let moreSpecification = [];
-        if (brandDetail.moreSpecification) {
-          try {
-            moreSpecification = JSON.parse(brandDetail.moreSpecification);
-          } catch (err) {
-            console.error(`Error parsing moreSpecification for ${brandDetail.model}:`, err);
-          }
-        }
-        return { ...brandDetail, moreSpecification }; // Add parsed `moreSpecification` to each detail
-      });
-
-      setBrandDetails(parsedDetails); // Assuming response format: { data: [...] }
       setDetailsLoading(false); // Stop loading
     } catch (err) {
       console.error('Error:', err); // Log error for debugging
-      setDetailsError('Failed to fetch brand details! Please try again later.');
+      setDetailsError(`Failed to fetch brand details! Brand have no Data`);
       setDetailsLoading(false); // Stop loading on error
+    } finally {
+      setDetailsLoading(false); // Stop loading in all cases
     }
   };
 
@@ -104,7 +101,7 @@ const ProductData = () => {
     const query = event.target.value;
 
     // Allow only alphabets and spaces using regex
-    if (!/^[a-zA-Z\s]*$/.test(query)) {
+    if (!/^[a-zA-Z0-9\s]*$/.test(query)) {
       alert('Only alphabets are allowed!'); // Display an error for invalid input
       return;
     }
@@ -112,27 +109,21 @@ const ProductData = () => {
     // Capitalize the first letter and make the rest lowercase
     const formattedQuery = query
       .split(' ') // Split input by spaces to handle multiple words
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' '); // Join the words back with a space
 
-    setSearchQuery(formattedQuery);
-
-    // // Filter brands based on search query
-    // const filtered = brands.filter((brand) => brand.toLowerCase().includes(query.toLowerCase()));
-    // setFilteredBrands(filtered);
-
-    // Trigger API call when user presses Enter
-    if (query && event.key === 'Enter') {
-      fetchBrandDetails(query);
-    }
+    setSearchQuery(query);
+    fetchBrandDetails(formattedQuery);
   };
 
   // ** Handle Brand Change (Dropdown selection) **
   const handleBrandChange = (event) => {
-    const brand = event.target.value;
-    setSelectedBrand(brand); // Set the selected brand
+    const brand = event.target.value; // Get the selected value
+    setSelectedBrand(brand); // Update state with the selected brand
     console.log('Selected Brand:', brand);
-    fetchBrandDetails(brand); // Fetch brand details when a brand is selected
+    if (brand) {
+      fetchBrandDetails(brand); // Trigger API call to fetch details for the selected brand
+    }
   };
 
   // ** Call fetchBrands on component mount **
@@ -144,8 +135,17 @@ const ProductData = () => {
     <Grid container rowSpacing={4.5} columnSpacing={2.75}>
       {/* Grid for Title */}
       <Grid item xs={12}>
-        <Typography variant="h5" sx={{ marginTop: '20px', marginBottom: '10px', textAlign: 'center', marginLeft: '50%' }}>
-          Brand List
+        <Typography
+          variant="h5"
+          sx={{
+            marginTop: '20px',
+            marginBottom: '10px',
+            textAlign: 'center',
+            marginLeft: '50%',
+            textShadow: 'extrabold'
+          }}
+        >
+          Phone Brands
         </Typography>
         {loading && <Typography>Loading...</Typography>} {/* Loading Indicator */}
         {error && <Typography color="error">{error}</Typography>} {/* Error Message */}
@@ -208,7 +208,18 @@ const ProductData = () => {
       {/* Brand Details */}
       <Grid item xs={12}>
         {detailsLoading && <Typography>Loading brand details...</Typography>}
-        {detailsError && <Typography color="error">{detailsError}</Typography>}
+        {detailsError && (
+          <Typography
+            color="error"
+            sx={{
+              textAlign: 'center',
+              fontWeight: 'bold',
+              fontSize: '25px'
+            }}
+          >
+            {detailsError}
+          </Typography>
+        )}
         {!detailsLoading && !detailsError && brandDetails.length > 0 && (
           <div
             style={{
@@ -236,37 +247,37 @@ const ProductData = () => {
                   <Typography variant="h6">{brandDetail.model}</Typography>
                   <img src={brandDetail.deviceImage} alt={brandDetail.model} style={{ width: '100px', height: 'auto' }} />
                   <Typography>
-                    <strong>Body:</strong> {brandDetail.body}
+                    <strong>Body :</strong> {brandDetail.body}
                   </Typography>
                   <Typography>
-                    <strong>Display Resolution:</strong> {brandDetail.displayResolution}
+                    <strong>Display Resolution :</strong> {brandDetail.displayResolution}
                   </Typography>
                   <Typography>
-                    <strong>Video:</strong> {brandDetail.video}
+                    <strong>Video :</strong> {brandDetail.video}
                   </Typography>
                   <Typography>
-                    <strong>Ram:</strong> {brandDetail.ram}
+                    <strong>Ram :</strong> {brandDetail.ram}
                   </Typography>
                   <Typography>
-                    <strong>Chipset:</strong> {brandDetail.chipset}
+                    <strong>Chipset :</strong> {brandDetail.chipset}
                   </Typography>
                   <Typography>
-                    <strong>Release Date:</strong> {brandDetail.releaseDate}
+                    <strong>Release Date :</strong> {brandDetail.releaseDate}
                   </Typography>
                   <Typography>
-                    <strong>Storage:</strong> {brandDetail.storage}
+                    <strong>Storage :</strong> {brandDetail.storage}
                   </Typography>
                   <Typography>
-                    <strong>Battery:</strong> {brandDetail.battery}
+                    <strong>Battery :</strong> {brandDetail.battery}
                   </Typography>
                   <Typography>
-                    <strong>Camera:</strong> {brandDetail.camera}
+                    <strong>Camera :</strong> {brandDetail.camera}
                   </Typography>
                   <Typography>
-                    <strong>Display Size:</strong> {brandDetail.displaySize}
+                    <strong>Display Size :</strong> {brandDetail.displaySize}
                   </Typography>
                   <Typography>
-                    <strong>OS:</strong> {brandDetail.osType}
+                    <strong>OS :</strong> {brandDetail.osType}
                   </Typography>
                   {/*<Typography>*/}
                   {/*  <strong>Price:</strong>{' '}*/}

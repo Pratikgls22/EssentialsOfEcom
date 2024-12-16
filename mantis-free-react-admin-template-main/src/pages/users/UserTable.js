@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TablePagination } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, TablePagination, Grid } from '@mui/material';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 // import { jwtDecode } from 'jwt-decode';
 
 // ==============================|| USER TABLE - HEADER ||============================== //
@@ -57,15 +60,20 @@ const UserTable = () => {
         throw new Error('Authentication token is missing. Please log in again.');
       }
 
-      // // Decode the token to extract user details
-      // const decodedToken = jwtDecode(token);
-      // console.log('Decoded Token:', decodedToken);
-      //
-      // // Check if the user's role is ROLE_ADMIN
-      // if (decodedToken.roleName !== 'ROLE_ADMIN') {
-      //   setTimeout(() => (window.location.href = '/accessDenied'), 3000);
-      //   throw new Error('Access Denied. You do not have the required role.');
-      // }
+      // Decode the token to extract user details
+      const decodedToken = jwtDecode(token);
+      console.log('Decoded Token:', decodedToken);
+
+      // Check if the user's role is ROLE_ADMIN
+      if (decodedToken.roleName === 'ROLE_ADMIN') {
+        // Show toast notification
+        toast.error('Access Denied. You do not have the required role.', {
+          position: 'top-center',
+          autoClose: 3000 // Automatically close after 3 seconds
+        });
+        setTimeout(() => (window.location.href = '/login'), 3000);
+        throw new Error('Access Denied. You do not have the required role.');
+      }
 
       const response = await fetch(
         `http://localhost:8080/api/v1/user/searchUser?pageNo=${pageNo}&pageSize=${pageSize}&sortBy=Id&sortOrder=ASC`,
@@ -108,82 +116,85 @@ const UserTable = () => {
   }, [page, rowsPerPage]);
 
   return (
-    <Box>
-      <Typography
-        variant="h4"
-        sx={{
-          textAlign: 'center', // Centers the text horizontally
-          my: 4 // Adds top and bottom margin (shorthand for marginY)
-        }}
-      >
-        User Management
-      </Typography>
-      {loading && <Typography variant="body1">Fetching user data...</Typography>}
-      {error && <Typography color="error" variant="body1">{`Error: ${error}`}</Typography>}
-      {!loading && !error && (
-        <TableContainer
+    <Grid>
+      <Box>
+        <Typography
+          variant="h4"
           sx={{
-            width: '100%',
-            overflowX: 'auto',
-            position: 'relative',
-            display: 'block',
-            maxWidth: '1000px',
-            margin: '0 auto', // Centers the table horizontally
-            '& td, & th': { whiteSpace: 'nowrap' }
+            textAlign: 'center', // Centers the text horizontally
+            my: 4 // Adds top and bottom margin (shorthand for marginY)
           }}
         >
-          <Table
+          User Management
+        </Typography>
+        {loading && <Typography variant="body1">Fetching user data...</Typography>}
+        {error && <Typography color="error" variant="body1">{`Error: ${error}`}</Typography>}
+        {!loading && !error && (
+          <TableContainer
             sx={{
-              // textAlign: 'center', // Centers the text horizontally
-              // my: 3, // Adds top and bottom margin (shorthand for marginY)
-              margin: '0 auto' // Centers the table horizontally
+              width: '100%',
+              overflowX: 'auto',
+              position: 'relative',
+              display: 'block',
+              maxWidth: '1000px',
+              margin: '0 auto', // Centers the table horizontally
+              '& td, & th': { whiteSpace: 'nowrap' }
             }}
           >
-            <UserTableHead />
-            <TableBody>
-              {users.map((user) => (
-                <TableRow
-                  key={user.id}
-                  hover
-                  sx={{
-                    '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
-                    '&:hover': { backgroundColor: '#f1f1f1' },
-                    borderBottom: '1px solid #ddd' // Adds border to rows
-                  }}
-                >
-                  <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
-                    {user.id}
-                  </TableCell>
-                  <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
-                    {user.userName}
-                  </TableCell>
-                  <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
-                    {user.email}
-                  </TableCell>
-                  <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
-                    {user.address}
-                  </TableCell>
-                  <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
-                    {user.roleName}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={totalUsers}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            nextIconButtonProps
-            onPageChange={handlePageChange}
-            onRowsPerPageChange={handleRowsPerPageChange}
-            sx={{ borderTop: '1px solid #ddd', padding: '10px' }}
-          />
-        </TableContainer>
-      )}
-    </Box>
+            <Table
+              sx={{
+                // textAlign: 'center', // Centers the text horizontally
+                // my: 3, // Adds top and bottom margin (shorthand for marginY)
+                margin: '0 auto' // Centers the table horizontally
+              }}
+            >
+              <UserTableHead />
+              <TableBody>
+                {users.map((user) => (
+                  <TableRow
+                    key={user.id}
+                    hover
+                    sx={{
+                      '&:nth-of-type(odd)': { backgroundColor: '#f9f9f9' },
+                      '&:hover': { backgroundColor: '#f1f1f1' },
+                      borderBottom: '1px solid #ddd' // Adds border to rows
+                    }}
+                  >
+                    <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
+                      {user.id}
+                    </TableCell>
+                    <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
+                      {user.userName}
+                    </TableCell>
+                    <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
+                      {user.email}
+                    </TableCell>
+                    <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
+                      {user.address}
+                    </TableCell>
+                    <TableCell align="left" sx={{ border: '1px solid #ddd' }}>
+                      {user.roleName}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={totalUsers}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              nextIconButtonProps
+              onPageChange={handlePageChange}
+              onRowsPerPageChange={handleRowsPerPageChange}
+              sx={{ borderTop: '1px solid #ddd', padding: '10px' }}
+            />
+          </TableContainer>
+        )}
+      </Box>
+      <ToastContainer />
+    </Grid>
   );
 };
 

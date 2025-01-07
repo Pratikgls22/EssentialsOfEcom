@@ -27,16 +27,19 @@ import AnimateButton from '../../components/@extended/AnimateButton';
 // import FirebaseSocial from './auth-forms/FirebaseSocial';
 import { useEffect, useState } from 'react';
 import { strengthColor, strengthIndicator } from '../../utils/password-strength';
+import { jwtDecode } from 'jwt-decode';
+import { toast } from 'react-toastify';
 
 // ================================|| REGISTER ||================================ //
 
 const Register = () => {
   const [level, setLevel] = useState();
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
-
+  console.log(error);
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
@@ -47,6 +50,23 @@ const Register = () => {
   };
 
   useEffect(() => {
+    // Retrieve the token form Cookies
+    const token = Cookies.get('authToken');
+    if (!token) {
+      setError('Authentication token is missing. Please log in again.');
+      setTimeout(() => (window.location.href = '/login'), 3000);
+    }
+
+    const decodedToken = jwtDecode(token);
+
+    if (decodedToken.userRole !== 'ROLE_ADMIN') {
+      setError('ADMIN Role is Missing, Please Check your Role');
+      toast.error('Only Admin can Access !!');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 5000);
+      return; // Stop execution here
+    }
     changePassword('');
   }, []);
 
@@ -115,14 +135,6 @@ const Register = () => {
               onSubmit={async (values, { setErrors, setStatus, setSubmitting }) => {
                 console.log('values', values);
                 try {
-                  // Retrieve the token form Cookies
-                  const token = Cookies.get('authToken');
-                  console.log(token);
-
-                  if (!token) {
-                    throw new Error('Authentication token is missing. Please log in again.');
-                  }
-
                   // Make the API request and set the token in headers
                   const response = await fetch('http://localhost:8080/api/v1/user/createUser', {
                     method: 'POST',

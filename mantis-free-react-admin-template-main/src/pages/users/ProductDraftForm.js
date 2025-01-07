@@ -5,6 +5,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import AnimateButton from '../../components/@extended/AnimateButton';
 import Cookies from 'js-cookie';
+import { jwtDecode } from 'jwt-decode';
 
 const ProductDraftForm = () => {
   const [loading, setLoading] = useState(true);
@@ -31,15 +32,6 @@ const ProductDraftForm = () => {
   const [price, setPrice] = useState('');
   const [status] = useState('PENDING');
   const [productId] = useState('');
-
-  // Retrieve the token from cookies
-  const token = Cookies.get('authToken');
-  console.log(token);
-  if (!token) {
-    // eslint-disable-next-line no-unreachable
-    setTimeout(() => (window.location.href = '/login'), 3000);
-    throw new Error('Authentication token is missing. Please log in again.');
-  }
 
   // For Fetch All Colors:
   const fetchColors = async () => {
@@ -112,10 +104,10 @@ const ProductDraftForm = () => {
     }
   };
   // For Fetch All Cameras :
-  const fetchCameras = async () => {
+  const fetchCameras = async (model) => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:8080/api/v1/phone/fetchCamera');
+      const response = await axios.get(`http://localhost:8080/api/v1/phone/fetchCamera/${model}`);
 
       const data = await response.data.data;
 
@@ -271,10 +263,29 @@ const ProductDraftForm = () => {
   };
 
   useEffect(() => {
+    const token = Cookies.get('authToken');
+
+    if (!token) {
+      setError('Authentication token is missing. Please log in again.');
+      setTimeout(() => (window.location.href = '/login'), 3000);
+      return;
+    }
+
+    const decodedToken = jwtDecode(token);
+
+    if (decodedToken.userRole !== 'Vendor') {
+      setError('Vendor Role is Missing, Please Check your Role');
+      toast.error('Only Vendor can Access !!');
+      setTimeout(() => {
+        window.location.href = '/login';
+      }, 5000);
+      return; // Stop execution here
+    }
+
+    // Fetch data only if no errors
     fetchBrands();
     fetchColors();
     fetchRams();
-    fetchCameras();
     fetchBatteries();
     fetchOperatingSystems();
     fetchInternalStorage();
@@ -325,6 +336,7 @@ const ProductDraftForm = () => {
     setSelectedModel(model);
     console.log('Selected model:', model, event.target.value);
     if (model) {
+      fetchCameras(model);
       fetchImages(model);
     }
   };
@@ -380,6 +392,7 @@ const ProductDraftForm = () => {
 
       if (response.status === 200) {
         toast.success('Product Draft created successfully!');
+        setTimeout(() => (window.location.href = '/vendorDraft'), 3000);
       } else {
         toast.error('Failed to create Product Draft. Please try again.');
       }
@@ -413,261 +426,284 @@ const ProductDraftForm = () => {
             Product Draft
           </Typography>
         </Grid>
-        {/*For Brand*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading brands...</Typography>
-          ) : error ? (
-            <Typography variant="body1" brand="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Brand</InputLabel>
-              <Select value={selectedBrand} onChange={handleBrandChange}>
-                {brands.map((brand, index) => (
-                  <MenuItem key={index} value={brand}>
-                    {brand}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For Model*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading && <Typography variant="body1">Loading models...</Typography>}
-          {/* Error Message via Toastify */}
-          {modelError && (
+
+        {/* Display error message */}
+        {error && (
+          <Grid item xs={12}>
             <Typography
+              variant="h6"
               color="error"
               sx={{
                 textAlign: 'center',
                 fontWeight: 'bold',
-                fontSize: '15px'
+                fontSize: '18px'
               }}
             >
-              {modelError}
+              {error}
             </Typography>
-          )}
-
-          <FormControl fullWidth>
-            <InputLabel>Select Model</InputLabel>
-            <ToastContainer />
-            <Select
-              value={selectedModel}
-              onChange={handleModelChange}
-              disabled={Array.isArray(models) && models.length === 0} // Disable dropdown if no models
-            >
-              {!loading && !modelError && Array.isArray(models) && models.length > 0 ? (
-                models.map((model, index) => (
-                  <MenuItem key={index} value={model}>
-                    {model}
-                  </MenuItem>
-                ))
+          </Grid>
+        )}
+        {/* Render dropdowns only when no error */}
+        {!error && (
+          <>
+            {/*For Brand*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading brands...</Typography>
+              ) : error ? (
+                <Typography variant="body1" brand="error">
+                  {error}
+                </Typography>
               ) : (
-                <MenuItem disabled>No Models Available</MenuItem>
+                <FormControl fullWidth>
+                  <InputLabel>Select Brand</InputLabel>
+                  <Select value={selectedBrand} onChange={handleBrandChange}>
+                    {brands.map((brand, index) => (
+                      <MenuItem key={index} value={brand}>
+                        {brand}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               )}
-            </Select>
-          </FormControl>
-        </Grid>
-        {/*For Image*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading images...</Typography>
-          ) : error ? (
-            <Typography variant="body1" image="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Image</InputLabel>
-              <Select value={selectedImage} onChange={handleImageChange}>
-                {images.map((image, index) => (
-                  <MenuItem key={index} value={image}>
-                    {image}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For Color*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading colors...</Typography>
-          ) : error ? (
-            <Typography variant="body1" color="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Color</InputLabel>
-              <Select value={selectedColor} onChange={handleColorChange}>
-                {colors.map((color, index) => (
-                  <MenuItem key={index} value={color}>
-                    {color}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For Ram*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading rams...</Typography>
-          ) : error ? (
-            <Typography variant="body1" ram="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Ram</InputLabel>
-              <Select value={selectedRam} onChange={handleRamChange}>
-                {rams.map((ram, index) => (
-                  <MenuItem key={index} value={ram}>
-                    {ram}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For InternalStorage*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading internalStorages...</Typography>
-          ) : error ? (
-            <Typography variant="body1" internalStorage="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select InternalStorage</InputLabel>
-              <Select value={selectedInternalStorage} onChange={handleInternalStorageChange}>
-                {internalStorages.map((internalStorage, index) => (
-                  <MenuItem key={index} value={internalStorage}>
-                    {internalStorage}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For Camera*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading cameras...</Typography>
-          ) : error ? (
-            <Typography variant="body1" camera="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Camera</InputLabel>
-              <Select value={selectedCamera} onChange={handleCameraChange}>
-                {cameras.map((camera, index) => (
-                  <MenuItem key={index} value={camera}>
-                    {camera}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For Battery*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading batteries...</Typography>
-          ) : error ? (
-            <Typography variant="body1" battery="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select Battery</InputLabel>
-              <Select value={selectedBattery} onChange={handleBatteryChange}>
-                {batteries.map((battery, index) => (
-                  <MenuItem key={index} value={battery}>
-                    {battery}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/*For OperatingSystem*/}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          {loading ? (
-            <Typography variant="body1">Loading operatingSystems...</Typography>
-          ) : error ? (
-            <Typography variant="body1" operatingSystem="error">
-              {error}
-            </Typography>
-          ) : (
-            <FormControl fullWidth>
-              <InputLabel>Select OperatingSystem</InputLabel>
-              <Select value={selectedOperatingSystem} onChange={handleOperatingSystemChange}>
-                {operatingSystems.map((operatingSystem, index) => (
-                  <MenuItem key={index} value={operatingSystem}>
-                    {operatingSystem}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          )}
-        </Grid>
-        {/* For price */}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          <FormControl fullWidth>
-            <TextField label="Price" type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
-          </FormControl>
-        </Grid>
+            </Grid>
+            {/*For Model*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading && <Typography variant="body1">Loading models...</Typography>}
+              {/* Error Message via Toastify */}
+              {modelError && (
+                <Typography
+                  color="error"
+                  sx={{
+                    textAlign: 'center',
+                    fontWeight: 'bold',
+                    fontSize: '15px'
+                  }}
+                >
+                  {modelError}
+                </Typography>
+              )}
 
-        {/* For status */}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          <FormControl fullWidth>
-            <TextField label="Status" type="text" value={status} />
-          </FormControl>
-        </Grid>
+              <FormControl fullWidth>
+                <InputLabel>Select Model</InputLabel>
+                <ToastContainer />
+                <Select
+                  value={selectedModel}
+                  onChange={handleModelChange}
+                  disabled={Array.isArray(models) && models.length === 0} // Disable dropdown if no models
+                >
+                  {!loading && !modelError && Array.isArray(models) && models.length > 0 ? (
+                    models.map((model, index) => (
+                      <MenuItem key={index} value={model}>
+                        {model}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No Models Available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+            {/*For Image*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading images...</Typography>
+              ) : error ? (
+                <Typography variant="body1" image="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select Image</InputLabel>
+                  <Select value={selectedImage} onChange={handleImageChange}>
+                    {images.map((image, index) => (
+                      <MenuItem key={index} value={image}>
+                        {image}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For Color*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading colors...</Typography>
+              ) : error ? (
+                <Typography variant="body1" color="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select Color</InputLabel>
+                  <Select value={selectedColor} onChange={handleColorChange}>
+                    {colors.map((color, index) => (
+                      <MenuItem key={index} value={color}>
+                        {color}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For Ram*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading rams...</Typography>
+              ) : error ? (
+                <Typography variant="body1" ram="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select Ram</InputLabel>
+                  <Select value={selectedRam} onChange={handleRamChange}>
+                    {rams.map((ram, index) => (
+                      <MenuItem key={index} value={ram}>
+                        {ram}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For InternalStorage*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading internalStorages...</Typography>
+              ) : error ? (
+                <Typography variant="body1" internalStorage="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select InternalStorage</InputLabel>
+                  <Select value={selectedInternalStorage} onChange={handleInternalStorageChange}>
+                    {internalStorages.map((internalStorage, index) => (
+                      <MenuItem key={index} value={internalStorage}>
+                        {internalStorage}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For Camera*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading cameras...</Typography>
+              ) : error ? (
+                <Typography variant="body1" camera="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select Camera</InputLabel>
+                  <Select value={selectedCamera} onChange={handleCameraChange}>
+                    {cameras.map((camera, index) => (
+                      <MenuItem key={index} value={camera}>
+                        {camera}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For Battery*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading batteries...</Typography>
+              ) : error ? (
+                <Typography variant="body1" battery="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select Battery</InputLabel>
+                  <Select value={selectedBattery} onChange={handleBatteryChange}>
+                    {batteries.map((battery, index) => (
+                      <MenuItem key={index} value={battery}>
+                        {battery}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
+            {/*For OperatingSystem*/}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              {loading ? (
+                <Typography variant="body1">Loading operatingSystems...</Typography>
+              ) : error ? (
+                <Typography variant="body1" operatingSystem="error">
+                  {error}
+                </Typography>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Select OperatingSystem</InputLabel>
+                  <Select value={selectedOperatingSystem} onChange={handleOperatingSystemChange}>
+                    {operatingSystems.map((operatingSystem, index) => (
+                      <MenuItem key={index} value={operatingSystem}>
+                        {operatingSystem}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+            </Grid>
 
-        {/* For ProductId */}
-        <Grid item xs={12}></Grid>
-        <Grid item xs={3}>
-          <FormControl fullWidth>
-            <TextField label="ProductId" type="text" value={productId} />
-          </FormControl>
-        </Grid>
+            {/* For price */}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              <FormControl fullWidth>
+                <TextField label="Price" type="text" value={price} onChange={(e) => setPrice(e.target.value)} />
+              </FormControl>
+            </Grid>
 
-        <Grid item xs={12}></Grid>
-        <Grid item xs={2}>
-          <AnimateButton>
-            <Button
-              disableElevation
-              fullWidth
-              size="large"
-              type="submit"
-              variant="contained"
-              color="primary"
-              style={{ fontWeight: 'bold' }}
-              onClick={handleProductDraft}
-            >
-              Create Product Draft
-            </Button>
-          </AnimateButton>
-        </Grid>
+            {/* For status */}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              <FormControl fullWidth>
+                <TextField label="Status" type="text" value={status} />
+              </FormControl>
+            </Grid>
+
+            {/* For ProductId */}
+            <Grid item xs={12}></Grid>
+            <Grid item xs={3}>
+              <FormControl fullWidth>
+                <TextField label="ProductId" type="text" value={productId} />
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}></Grid>
+            <Grid item xs={2}>
+              <AnimateButton>
+                <Button
+                  disableElevation
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  style={{ fontWeight: 'bold' }}
+                  onClick={handleProductDraft}
+                >
+                  Create Product Draft
+                </Button>
+              </AnimateButton>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Grid>
   );

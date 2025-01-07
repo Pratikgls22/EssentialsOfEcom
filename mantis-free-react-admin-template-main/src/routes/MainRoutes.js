@@ -16,7 +16,8 @@ const Typography = Loadable(lazy(() => import('pages/components-overview/Typogra
 const Color = Loadable(lazy(() => import('pages/components-overview/Color')));
 const Shadow = Loadable(lazy(() => import('pages/components-overview/Shadow')));
 const AntIcons = Loadable(lazy(() => import('pages/components-overview/AntIcons')));
-// const UserTableList = Loadable(lazy(() => import('pages/users/UserTable')));
+const UserTableList = Loadable(lazy(() => import('pages/users/UserTable')));
+
 
 // ==============================|| MAIN ROUTING ||============================== //
 
@@ -32,10 +33,10 @@ const MainRoutes = {
       path: '/dashboard',
       element: <DashboardDefault />
     },
-    // {
-    //   path: '/userTable',
-    //   element: <UserTableList />
-    // },
+    {
+      path: '/userTable',
+      element: <UserTableList />
+    },
     {
       path: 'color',
       element: <Color />

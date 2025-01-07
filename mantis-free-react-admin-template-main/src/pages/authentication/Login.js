@@ -105,10 +105,10 @@ const Login = () => {
                   navigate('/userTable');
                 } else if (decodedToken.userRole === 'Vendor') {
                   // Navigate to dashboard
-                  navigate('/dashboard');
+                  navigate('/productDraft');
                 } else if (decodedToken.userRole === 'Customer') {
                   // Navigate to dashboard
-                  navigate('/product');
+                  navigate('/products');
                 } else {
                   setTimeout(() => (window.location.href = '/register'), 3000);
                   throw new Error('Access Denied. You are not required User.');

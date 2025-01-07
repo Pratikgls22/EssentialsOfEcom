@@ -1,11 +1,13 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ApproveDraft = async (draftId) => {
   const token = Cookies.get('authToken'); // Get the token from cookies
 
   if (!token) {
-    alert('Authentication token is missing. Please log in again.');
+    toast.error('Authentication token is missing. Please log in again.');
     return;
   }
 
@@ -16,17 +18,17 @@ const ApproveDraft = async (draftId) => {
         Authorization: `Bearer ${token}` // Pass token in headers
       }
     });
-
     if (response.status === 200) {
-      alert('Product Draft Approved Successfully!');
+      toast.success('Product Draft Approved Successfully!');
+      setTimeout(() => (window.location.href = '/fetchProductDraft'), 2000);
       return response.data; // Return the response data if needed
     } else {
-      alert(`Failed to approve the draft. Status: ${response.status}`);
+      toast.error(`Failed to approve the draft. Status: ${response.status}`);
       return null;
     }
   } catch (error) {
     console.error('Error approving the draft:', error);
-    alert('An error occurred while approving the draft. Please try again.');
+    toast.error('An error occurred while approving the draft. Please try again.');
     return null;
   }
 };

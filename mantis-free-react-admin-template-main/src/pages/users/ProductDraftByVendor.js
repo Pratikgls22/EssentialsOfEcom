@@ -5,8 +5,9 @@ import { Button, Grid, Typography } from '@mui/material';
 import ApproveDraft from '../utilies/ApproveDraft';
 import RejectProductDraft from '../utilies/RejectProductDraft';
 import { ToastContainer } from 'react-toastify';
+import { jwtDecode } from 'jwt-decode';
 
-const FetchProductDraft = () => {
+const ProductDraftByVendor = () => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState(null);
   const [statusDetails, setStatusDetails] = useState(null);
@@ -16,7 +17,8 @@ const FetchProductDraft = () => {
 
   useEffect(() => {
     if (token) {
-      fetchStatusDetails();
+      const decodedToken = jwtDecode(token);
+      fetchStatusDetails(decodedToken.userId);
     } else {
       // If no token, redirect to login
       setTimeout(() => (window.location.href = '/login'), 3000);
@@ -24,14 +26,13 @@ const FetchProductDraft = () => {
   }, [token]);
 
   // Function to fetch status details
-  const fetchStatusDetails = async () => {
+  const fetchStatusDetails = async (vendorId) => {
     setDetailsLoading(true); // Start loading for status details
     setDetailsError(null); // Clear any previous error
     setStatusDetails(null); // Clear previous status details
 
     try {
-      const status = 'PENDING';
-      const response = await axios.get(`http://localhost:8080/product/findStatus/status?status=${status}`, {
+      const response = await axios.get(`http://localhost:8080/product/productDrafts/${vendorId}`, {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}` // Pass the authentication token
@@ -188,5 +189,4 @@ const FetchProductDraft = () => {
     </Grid>
   );
 };
-
-export default FetchProductDraft;
+export default ProductDraftByVendor;

@@ -6,11 +6,13 @@ import CustomLayout from '../layout/CustomLayout';
 
 // render - login
 const VendorRegister = Loadable(lazy(() => import('pages/users/VendorRegister')));
-const UserTableList = Loadable(lazy(() => import('pages/users/UserTable')));
+// const UserTableList = Loadable(lazy(() => import('pages/users/UserTable')));
 const Products = Loadable(lazy(() => import('pages/users/ProductData')));
 const ProductDrafts = Loadable(lazy(() => import('pages/users/ProductDraftForm')));
 const UserLogout = Loadable(lazy(() => import('pages/authentication/Logout')));
 const FetchProductDrafts = Loadable(lazy(() => import('pages/users/FetchProductDraft')));
+const FetchProducts = Loadable(lazy(() => import('pages/users/FetchProducts')));
+const VendorProductDraft = Loadable(lazy(() => import('pages/users/ProductDraftByVendor')));
 
 // ==============================|| AUTH ROUTING ||============================== //
 
@@ -35,9 +37,17 @@ const CustomRoutes = {
       element: <VendorRegister />
     },
     {
-      path: '/userTable',
-      element: <UserTableList />
+      path: '/products',
+      element: <FetchProducts />
     },
+    {
+      path: '/vendorDraft',
+      element: <VendorProductDraft />
+    },
+    // {
+    //   path: '/userTable',
+    //   element: <UserTableList />
+    // },
     {
       path: '/logout',
       element: <UserLogout />

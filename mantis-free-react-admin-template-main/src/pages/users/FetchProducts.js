@@ -1,27 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import Cookies from 'js-cookie';
 import { Button, Grid, Typography } from '@mui/material';
 import ApproveDraft from '../utilies/ApproveDraft';
-import RejectProductDraft from '../utilies/RejectProductDraft';
 import { ToastContainer } from 'react-toastify';
 
-const FetchProductDraft = () => {
+const FetchProducts = () => {
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState(null);
   const [statusDetails, setStatusDetails] = useState(null);
 
-  // Retrieve the token from cookies
-  const token = Cookies.get('authToken');
+  // // Retrieve the token from cookies
+  // const token = Cookies.get('authToken');
 
   useEffect(() => {
-    if (token) {
-      fetchStatusDetails();
-    } else {
-      // If no token, redirect to login
-      setTimeout(() => (window.location.href = '/login'), 3000);
-    }
-  }, [token]);
+    fetchStatusDetails();
+    // if (token) {
+    //   fetchStatusDetails();
+    // } else {
+    //   // If no token, redirect to login
+    //   setTimeout(() => (window.location.href = '/login'), 3000);
+    // }
+  }, []);
 
   // Function to fetch status details
   const fetchStatusDetails = async () => {
@@ -30,11 +29,10 @@ const FetchProductDraft = () => {
     setStatusDetails(null); // Clear previous status details
 
     try {
-      const status = 'PENDING';
-      const response = await axios.get(`http://localhost:8080/product/findStatus/status?status=${status}`, {
+      const response = await axios.get(`http://localhost:8080/product/fetchAllProducts`, {
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` // Pass the authentication token
+          'Content-Type': 'application/json'
+          // Authorization: `Bearer ${token}` // Pass the authentication token
         }
       });
       console.log('Response data :', response.data.data);
@@ -59,7 +57,7 @@ const FetchProductDraft = () => {
 
   return (
     <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center' }}>
-      {detailsLoading && <Typography>Loading status details...</Typography>}
+      {detailsLoading && <Typography>Loading products details...</Typography>}
       {detailsError && (
         <Typography
           color="error"
@@ -82,7 +80,7 @@ const FetchProductDraft = () => {
           }}
         >
           <Grid xs={12} sx={{ display: 'flex', justifyContent: 'center', marginBottom: '8px' }}>
-            <Typography variant="h3"> Products Draft </Typography>
+            <Typography variant="h3"> Products </Typography>
           </Grid>
           <div
             style={{
@@ -109,6 +107,8 @@ const FetchProductDraft = () => {
                 >
                   <div
                     style={{
+                      marginLeft: '30px',
+                      marginRight: '30px',
                       textAlign: 'center',
                       flex: '1', // Take up equal space on the left
                       display: 'flex', // Nested flexbox for vertical alignment
@@ -136,8 +136,7 @@ const FetchProductDraft = () => {
                   <div
                     style={{
                       textAlign: 'left',
-                      flex: '2', // Take up more space on the right
-                      paddingLeft: '20px' // Add space between the two sections
+                      flex: '1' // Take up more space on the right
                     }}
                   >
                     <Typography>
@@ -159,23 +158,14 @@ const FetchProductDraft = () => {
                       <strong>Price:</strong> ₹{statusDetail.price}
                     </Typography>
                     <Typography>
-                      <strong>Camera:</strong> {statusDetail.camera}
+                      <strong>Main Camera:</strong> {statusDetail.mainCamera}
                     </Typography>
                     <Typography>
-                      <strong>Status:</strong> {statusDetail.status}
+                      <strong>Selfie Camera:</strong> {statusDetail.selfieCamera}
                     </Typography>
-                    {/* Approved Button */}
+                    {/* Add to Cart Button */}
                     <Button variant="contained" color="primary" onClick={() => ApproveDraft(statusDetail.id)} style={{ marginTop: '10px' }}>
-                      Approved
-                    </Button>
-                    {/* Approved Button */}
-                    <Button
-                      variant="contained"
-                      color="error"
-                      onClick={() => RejectProductDraft(statusDetail.id)}
-                      style={{ marginTop: '10px', marginLeft: '8px' }}
-                    >
-                      Rejected
+                      Add to Cart
                     </Button>
                   </div>
                 </div>
@@ -189,4 +179,4 @@ const FetchProductDraft = () => {
   );
 };
 
-export default FetchProductDraft;
+export default FetchProducts;
